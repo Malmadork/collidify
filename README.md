@@ -104,6 +104,18 @@ var options = {
 $('.draggable').collidify(options);
 ```
 
+Example 6: Multiple Elements
+```js
+var options = {
+    border: [ $('.border'), $('.other-border') ],
+    onBorder: function() {
+        console.log("Border Added!")
+    }
+}
+
+$('.draggable').collidify(options);
+```
+
 # Options
 
 ```js
