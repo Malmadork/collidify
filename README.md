@@ -16,10 +16,13 @@ jQuery CDN Links:<br>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 ```
 
-To use collidify, just use `element.collidify()`!
+**Using Collidify:**
 
 ```js
-//Collidify Function - Turns the element into a draggable with no arguments
+/** $(element).collidify() 
+ *  Does not require any parameters.
+ *  Using no parameters turns an element into a draggable.
+ */
 $('.draggable').collidify()
 
 /*
@@ -30,11 +33,75 @@ $('.draggable').collidify()
 *   those which are applied to $('.draggable').draggable()
 */
 
-// $(element).collidify(collisionOptions, draggableOptions)
+// Usage:
+$(element).collidify(collisionOptions, draggableOptions)
+
+// Example:
 $('.draggable').collidify({ collides: [ $('.collider') ] },
                           { containment: $('.container') } )
 
-// More detailed docs and examples coming soon!!!
+```
+
+So what kinds of things can you do with collidify?
+
+Example 1: Adding a border when dragged over
+```js
+var options = {
+    border: [ $('.border') ]
+}
+
+$('.draggable').collidify(options);
+```
+
+Example 2: Reverting an element when dragged and dropped
+(Invalid droppable)
+```js
+var options = {
+    revert: [ $('.invalid') ]
+}
+
+$('.draggable').collidify(options);
+```
+
+Example 3: Triggering an event when collision is detected
+```js
+var options = {
+    collides: [ $('.collide') ],
+    onCollideEnter: function() {
+        console.log("Collision!");
+    }
+}
+
+$('.draggable').collidify(options);
+```
+
+Example 4: Changing border colors, and logging when the border is removed
+```js
+var options = {
+    border: [ $('.collide') ],
+    borderStyle: "2px dashed blue",
+    onBorderRemove: function() {
+        console.log("Border Removed!");
+    }
+}
+
+$('.draggable').collidify(options);
+```
+
+Example 5: Mix and Match events!
+```js
+var options = {
+    revert: [ $('.invalid') ],
+    collides: [ $('.invalid') ],
+    onCollideEnter: function() {
+        console.log("Entered Collision");
+    },
+    onRevert: function() {
+        console.log("Reverted!");
+    }
+}
+
+$('.draggable').collidify(options);
 ```
 
 # Options
@@ -50,5 +117,13 @@ onBorderRemove() {}, //Triggers whenever a listed element loses a border
 onCollideEnter() {}, //Triggers once the element has entered the bounds of a listed element
 onCollideLeave() {}, //Triggers once the element has left the bounds of a listed element
 borderStyle: "2px dashed blue", //The style for border events
-borderClass: ".border" //A class for border events
+borderClass: ".border", //A class for border events
+
+// You may use the jquery start, drag, and end events in the second parameter, 
+// but if you want to keep code concise, you can use the following events as well!
+onStart() {}, // Triggers when dragging starts (used in the first parameter)
+onDrag() {}, // Triggers when dragging (used in the first parameter)
+onEnd() {}, // Triggers when dragging ends (used in the first parameter)
+
+
 ```
