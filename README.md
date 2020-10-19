@@ -116,6 +116,32 @@ var options = {
 $('.draggable').collidify(options);
 ```
 
+Example 7: Detecting collision when the draggable is completely inside the other
+```js
+var options = {
+    border: [ 
+        {
+            element: $('.border'),
+            type: "inside" // When Completely inside
+        }
+    ],
+    collides: [ 
+        {
+            element: $('.collide'),
+            type: "enter" //When Entered (default)
+        }
+    ],
+    revert: [ 
+        {
+            element: $('.revert'),
+            type: "inside" //When Inside (causes overlap)
+        }
+    ]
+}
+//Only shows a border when dragged completely inside the other element/
+$('.draggable').collidify(options);
+```
+
 # Options
 
 ```js

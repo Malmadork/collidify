@@ -8,16 +8,13 @@
         if(collisions.border) {
             if(Array.isArray(collisions.border)) {
                 if(collisions.border.length > 0) {
-                        
                     $.fn.collidify.preBorderStyles = $.fn.collidify.getPreborderStyles(collisions.border);
-                   
                 }
             }
             else {
                 console.error("OPTIONS.revert must be of type array.")
             }
         }
-
         var events = {
             start: function() {
                 $.fn.collidify.element.originalPosition.top = $(this).offset().top;
@@ -63,8 +60,7 @@
                 if(collisions.border) {
                     if(Array.isArray(collisions.border)) {
                         if(collisions.border.length > 0) {
-                            if($.fn.collidify.checkCollision( collisions.border)) {
-
+                            if($.fn.collidify.checkCollision( collisions.border )) {
 
                                 
                                 let borderStyle = 
@@ -124,7 +120,7 @@
  
         var eventopts = $.extend( {}, dragopts, events );
         
-        
+
         if($.ui === undefined || !$.ui.version) {
             return console.error("collidify.js requires jquery.ui to function!")
         }
@@ -132,7 +128,6 @@
             return this.draggable(eventopts)
         }
 
-        
     };
 
     $.fn.collidify.collisions = {
@@ -178,28 +173,44 @@
 
     $.fn.collidify.checkCollision = function(bounds) {
         let result = false;
+        
         bounds.forEach(bound => {
-            if(typeof bound === 'object') {
-                if(bound.selector) {
-                   bound.each(function(i, obj) {
-                    let obj_offset = $(obj).offset()
+
+            let boundElement = (typeof bound === 'object' && bound.selector) ? 
+                bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
+                bound.element : null);
+
+            let boundType = (typeof bound === 'object' && bound.type) ? bound.type : "enter"
+
+                if(boundElement !== null) {
+                    boundElement.each(function(i, obj) {
+                        let obj_offset = $(obj).offset()
                     let w = $(obj).width();
                     let h = $(obj).height();
                     let pos = $.fn.collidify.element.newPosition;
               
-                    if (pos.left < obj_offset.left + w &&
-                        pos.right  > obj_offset.left &&
-                        pos.top < obj_offset.top + h &&
-                        pos.bottom > obj_offset.top) {
-                        
-                            result = true;
-                        
+                    if(boundType == "enter") {
+                        if (pos.left < obj_offset.left + w &&
+                            pos.right  > obj_offset.left &&
+                            pos.top < obj_offset.top + h &&
+                            pos.bottom > obj_offset.top) {
+                            
+                                result = true;
+                            
+                        }
                     }
-                    else {
+                    else if(boundType == "inside") {
+                        if (pos.right < obj_offset.left + w &&
+                            pos.left  > obj_offset.left &&
+                            pos.bottom < obj_offset.top + h &&
+                            pos.top > obj_offset.top) {
+                            
+                                result = true;
+                        }
                     }
-                   })
+                    
+                    })
                 }
-            }
         })
 
         return result;
@@ -208,9 +219,12 @@
     $.fn.collidify.getCollisionItems = function(bounds) {
         let result = [];
         bounds.forEach(bound => {
-            if(typeof bound === 'object') {
-                if(bound.selector) {
-                   bound.each(function(i, obj) {
+
+            let boundElement = (typeof bound === 'object' && bound.selector) ? 
+                bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
+                bound.element : null);
+
+                boundElement.each(function(i, obj) {
                     let obj_offset = $(obj).offset()
                     let w = $(obj).width();
                     let h = $(obj).height();
@@ -221,12 +235,10 @@
                         pos.top < obj_offset.top + h &&
                         pos.bottom > obj_offset.top) {
                         
-                            result.push(bound);
+                            result.push(boundElement);
                         
                     }
-                   })
-                }
-            }
+                })
         })
 
         return result;
@@ -234,9 +246,12 @@
 
     $.fn.collidify.removeBorder = function(bounds) {
         bounds.forEach(bound => {
-            if(typeof bound === 'object') {
-                if(bound.selector) {
-                   bound.each(function(i, obj) {
+
+            let boundElement = (typeof bound === 'object' && bound.selector) ? 
+                bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
+                bound.element : null);
+
+                boundElement.each(function(i, obj) {
                     let obj_offset = $(obj).offset()
                     let w = $(obj).width();
                     let h = $(obj).height();
@@ -246,9 +261,7 @@
                         pos.right  > obj_offset.left &&
                         pos.top < obj_offset.top + h &&
                         pos.bottom > obj_offset.top) {
-                        
-                           
-                        
+
                     }
                     else {
                         
@@ -265,25 +278,25 @@
                         }
                         
                     }
-                   })
-                }
-            }
+                })
         })
     }
 
     $.fn.collidify.getPreborderStyles = function(bounds) {
         let result = [];
         bounds.forEach(bound => {
-            if(typeof bound === 'object') {
-                if(bound.selector) {
-                   bound.each(function(i, obj) {
-                        result.push({
-                            element: $(obj),
-                            style: $(obj).css("border")
-                        })
-                   })
-                }
-            }
+
+            let boundElement = (typeof bound === 'object' && bound.selector) ? 
+                bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
+                bound.element : null);
+
+            boundElement.each(function(i, obj) {
+                result.push({
+                    element: $(obj),
+                    style: $(obj).css("border")
+                })
+            })
+            
         })
 
         return result;
