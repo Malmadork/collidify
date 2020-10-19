@@ -9,6 +9,8 @@ During the process of working one of my projects, I really wanted to have dragga
 # Documentation
 collidify requires you to have jQuery and jQuery UI in order to properly use the plugin! 
 
+Full Documentation at: https://malmadork.github.io/collidify/index.html
+
 jQuery CDN Links:<br>
 ```html
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script>
