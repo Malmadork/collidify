@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:700,600" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" type="text/css">
+        <script src="./collidify.js"></script>
+    </head>
+    <body>
+        <style>
+            body {
+                background-color: #252525;
+                color:#F0E7d5;
+                padding:0%;
+            }
+            .container {
+                border: 1px solid black;
+                width:50vw;
+                height:50vh;
+                position: relative;
+            }
+
+            .draggable {
+                border: 1px solid red;
+                height:50px;
+                width:50px;
+            }
+            .obstacle {
+                border: 1px solid purple;
+                height:100px;
+                width:100px;
+                position:absolute;
+                bottom:0;
+                right:0;
+            }
+            .border {
+                border: 1px solid black;
+                height:100px;
+                width:100px;
+                position:absolute;
+                top:0;
+                right:0;
+            }
+            #header {
+                background-color: #353535;
+                width:100%;
+                margin:0;
+                height:10%;
+            }
+            #header {
+              background-color: #353535;
+              color:#353535;
+              
+              text-align: center;
+              font-size: 70px;
+              height:20%;
+              font-weight: bold;
+              top: 0;
+              left:0;
+              width: 100%;
+              
+              font-family: 'Raleway', sans-serif;
+            }
+            .fade-in {
+                padding:0;
+                margin:0;
+            }
+            #headerinner {
+                position: relative;
+                margin:0;
+                padding:1px;
+                padding-bottom:5px;
+            }
+            .bottomline {
+                width: 100%;
+                height: 5px;
+                background-color:#454545;
+                position:absolute;
+                bottom:0;
+                left:0;
+            }
+            .fork {
+                position: absolute;
+                top:30%;
+                left:10px;
+                height:30%;
+                background-color: #1d8b42;
+                font-size:20px;
+                padding:.3em .6em;
+                border:1px solid gray;
+                border-radius: 5px;
+                cursor:pointer;
+                color:#1d8b42
+            }
+            .author {
+                position: absolute;
+                top:30%;
+                right:10px;
+                height:30%;
+                font-size:20px;
+                padding:.3em .6em;
+                color:#353535;
+            }
+            .body {
+                padding:3% 15%;
+            }
+            .menu {
+                display:flex;
+            }
+            .menu a {
+                color:white;
+                cursor: pointer;
+            }
+            .menu a:not(:last-child)::after {
+                content: " | ";
+                margin-right: 5px;
+                color:antiquewhite;
+                cursor: default;
+            }
+            .underline-title {
+                border-bottom: 2px solid gray;
+            }
+        </style>
+
+        <div id="header">
+            <div id="headerinner">
+                <div class="fork">View me on Github!</div>
+                <div class="author">Created by Malmadork</div>
+                <p class="fade-in">collidify.js</p>
+                <div class="bottomline"></div>
+            </div>
+        </div>
+        <div class="body">
+            <div class="menu">
+                <a><u>What is collidify?</u></a>
+                <a><u>Get Started</u></a>
+                <a><u>Features</u></a>
+                <a><u>Examples</u></a>
+            </div>
+
+            <h1 class="underline-title">What is collidify?</h1>
+            <p>Docs coming soon!</p>
+            <h1 class="underline-title">Get Started</h1>
+            <p>Docs coming soon!</p>
+            <h1 class="underline-title">Features</h1>
+            <p>Docs coming soon!</p>
+            <h1 class="underline-title">Examples</h1>
+            <p>Docs coming soon!</p>
+        </div>
+        
+        
+        <script>
+
+            window.onload = function() {
+                
+                $('.fade-in').animate({color: "white"}, 400)
+                $('.author').animate({color: "#F0E7d5"}, 900)
+                $('.fork').animate({color: "#353535"}, 900)
+            }
+
+            $('.fork').off().hover(function() {
+                $(this).animate({borderColor:"white"}, {duration:200})
+            }, function() {
+                $(this).animate({borderColor:"gray"}, {duration:200})
+            })
+            $('.fork').mousedown(function(){
+                let a = document.createElement('a');
+                a.href = "https://github.com/Malmadork/collidify";
+                a.target = "_blank";
+                a.click();
+            })
+
+            var collisions = {
+                collides: [
+                    {
+                        element: $('.obstacle'),
+                        type: "inside"
+                    }
+                ],
+                revert: [
+                    {
+                        element: $('.obstacle'),
+                        type: "inside"
+                    }
+                ],
+                border: [
+                    $('.border')
+                ],
+                onCollide() {
+                    
+                },
+                onRevert() {
+                    console.log("Reverted!")
+                },
+                onBorder() {
+                    console.log("Border added")
+                },
+                onBorderRemove() {
+                    console.log("Border removed!")
+                },
+                onCollideEnter() {
+                    console.log("Entered Collision!")
+                },
+                onCollideLeave() {
+                    console.log("Left Collision!")
+                },
+                borderStyle: "2px dashed blue"
+            }
+            
+            $('.draggable').collidify(collisions, {
+                containment: ".container",
+            })
+        </script>
+    </body>
+</html>
