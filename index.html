@@ -10,6 +10,12 @@
         <script src="./collidify.js"></script>
         <link rel="stylesheet" href="./prism.css">
         <script src="./prism.js"></script>
+
+        <title>Collidify.js - Malmadork</title>
+        <meta property="og:title" content="collidify.js">
+        <meta property="og:description" content="collidify.js is a jQuery plugin that handles jQuery UI draggable collision events.">
+        <meta property="og:image" content="https://malmadork.github.io/collidify/meta-icon.png" >
+        <meta property="og:url" content="https://malmadork.github.io/collidify/index.html">
     </head>
     <body>
         <div id=#top style="position: absolute;top:0"></div>
@@ -198,9 +204,37 @@
             
             
             <h1 class="underline-title" id="docs">Documentation</h1>
-            <p>Docs coming soon!</p>
+            <p>collidify.js is super easy to use, and has a great amount potential for customization.</p>
+            <h2 class="mini-underline">Element.collidify()</h2>
+            <p>The syntax for using collidify is shown below. The collisionOptions is an object that is used for collisions,
+                whereas draggableOptions is where you can put your typical jQuery UI draggable options</p>
+            <pre class="language-javascript"><code>$(element).collidify(collisionOptions, draggableOptions)</code></pre>
             
-            
+            <h2 class="mini-underline">Options and Events</h2>
+            <h4 class="mini-underline">Options</h4>
+            <p>The collisionOptions parameter can take several options pertaining to collision events, and can be mix and matched. However, 
+                if borderStyle is used, borderClass does not need to be used.</p>
+            <pre class="language-javascript"><code>collides: [], // An array of elements that trigger collision events
+revert:   [], // An array of elements that will revert position if dragged over
+border:   [], // Lists the items that that will receive a border when the element is dragged over
+borderStyle: "2px dashed blue", //The style for border events
+borderClass: ".border", //A class for border events</code></pre>
+
+            <h4 class="mini-underline">Events</h4>
+            <p>The collisionOptions parameter does also have a bunch of events that can be used with other options, and can be customized to your liking.</p>
+            <pre class="language-javascript"><code>onCollide() {}, // A function trat triggers whenever an element is dragged and collides
+onRevert()  {}, // A function trat triggers whenever an element is reverted
+onBorder()  {}, // A function trat triggers whenever an element is given a border
+onBorderRemove() {}, // A function trat triggers whenever an element's border is removed
+onCollideEnter() {}, // A function trat triggers whenever an element enters collision
+onCollideLeave() {}, // A function trat triggers whenever an element leaves collision
+
+// You may use the jquery start, drag, and end events in draggableOptions, 
+// but if you want to keep code concise, you can use the following events as well!
+onStart() {}, // Triggers when dragging starts (used in collisionOptions)
+onDrag() {}, // Triggers when dragging (used in collisionOptions)
+onEnd() {}, // Triggers when dragging ends (used in collisionOptions)</code></pre>
+
             <h1 class="underline-title" id="examples">Examples</h1>
             <h3 class="mini-underline">Creating Draggables</h3>
             <p>This example shows you how to create a plain draggable (we'll get to the collision next!)</p>
