@@ -13,6 +13,9 @@
     </head>
     <body>
         <style>
+            html {
+                scroll-behavior: smooth;
+            }
             body {
                 background-color: #252525;
                 color:#F0E7d5;
@@ -147,13 +150,13 @@
         </div>
         <div class="body">
             <div class="menu">
-                <a><u>What is collidify?</u></a>
-                <a><u>Get Started</u></a>
-                <a><u>Features</u></a>
-                <a><u>Examples</u></a>
+                <a href="#whatis"><u>What is collidify?</u></a>
+                <a href="#getstarted"><u>Get Started</u></a>
+                <a href="#docs"><u>Documentation</u></a>
+                <a href="#examples"><u>Examples</u></a>
             </div>
 
-            <h1 class="underline-title">What is collidify?</h1>
+            <h1 class="underline-title" id="whatis">What is collidify?</h1>
             <p>collidify.js is a jQuery plugin that handles jQuery UI draggable collision events. 
             <br><br>
             During the process of working one of my projects, I really wanted to have draggable elements around a countainer, but revert back if invalid. 
@@ -163,7 +166,7 @@
             Thus, collidify.js has a built in border function to make certain collision events easier to handle!
             <br><br>
             In short, collidify.js can help handle your collision events with draggables and has built in methods for reverting and applying borders to elements!</p>
-            <h1 class="underline-title">Get Started</h1>
+            <h1 class="underline-title" id="getstarted">Get Started</h1>
             <h2 class="mini-underline">Getting collidify.js</h2>
             <h4 class="mini-underline">Source</h4>
             You can download the source from GitHub <a href="https://github.com/Malmadork/collidify/blob/main/src/collidify.js" target="_blank" style="color:white">here.</a>
@@ -178,7 +181,13 @@
             or get the official downloads for them here: <br>
             <a href="https://jquery.com/" target="_blank"  style="color:white">jQuery</a><br>
             <a href="https://jqueryui.com/" target="_blank"  style="color:white">jQuery UI</a><br><br>Make sure you link collidify.js <b>after</b> linking jQuery and UI!
-            <h1 class="underline-title">Features</h1>
+            
+            
+            <h1 class="underline-title" id="docs">Documentation</h1>
+            <p>Docs coming soon!</p>
+            
+            
+            <h1 class="underline-title" id="examples">Examples</h1>
             <h3 class="mini-underline">Creating Draggables</h3>
             <p>This example shows you how to create a plain draggable (we'll get to the collision next!)</p>
             <div id="features-create" class="container">
@@ -237,11 +246,73 @@ $('.draggable').collidify(options, {
 $('.draggable').collidify(options, {
     containment: ".container"
 })</code></pre>
+<h3 class="mini-underline">Detect Collision when Inside Element</h3>
+            <p>Detecting when collision is detected when entering an element completely.</p>
+            <div id="features-inside" class="container">
+                <div class="inside-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+                <div class="inside-obstacle obstacle">
+                    <p style="text-align: center;color:black">Drag inside me!</p>
+                    <p style="text-align: center;color:black" class="inside-text">No Collision yet...</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>var options = {
+    collides: [ {
+        element: $('.obstacle'), //Elements to collide with
+        type: "inside" //Default is "enter", but "inside" collision works different
+    } ],
+    onCollideEnter: function() { //When Collision Detected:
+        $('.obstacle-text').html("Collision!")
+    },
+    onCollideLeave: function() { //When No More Collision:
+        $('.obstacle-text').html("No more Collision!")
+    }
+}
 
-            <h1 class="underline-title">Examples</h1>
-            <p>Docs coming soon!</p>
+$('.draggable').collidify(options, {
+    containment: ".container"
+})</code></pre>
+
+<h3 class="mini-underline">Border on Collision</h3>
+            <p>Give a border to an element when dragged over.</p>
+            <div id="features-border" class="container">
+                <div class="border-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+                <div class="border-obstacle obstacle">
+                    <p style="text-align: center;color:black">Drag inside me!</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>var options = {
+    border: [ $('.obstacle') ],
+    borderStyle: "2px dashed blue"
+}
+
+$('.draggable').collidify(options, {
+    containment: ".container"
+})</code></pre>
+
+<h3 class="mini-underline">Revert on Drop</h3>
+            <p>Reverts the draggable when it is dropped on another element.</p>
+            <div id="features-revert" class="container">
+                <div class="revert-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+                <div class="revert-obstacle obstacle">
+                    <p style="text-align: center;color:black" class="revert-text">Drag inside me and release!</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>var options = {
+    revert: [ $('.obstacle') ]
+}
+
+$('.draggable').collidify(options, {
+    containment: ".container"
+})</code></pre>
+
+            
         </div>
-        
         
         <script>
 
@@ -265,6 +336,7 @@ $('.draggable').collidify(options, {
             })
 
             $('.create-draggable').collidify({}, {
+                scroll: false,
                 containment: "#features-create"
             })
             $('.detect-draggable').collidify({
@@ -276,6 +348,7 @@ $('.draggable').collidify(options, {
                     $('.detect-text').html("No more Collision!")
                 }
             }, {
+                scroll: false,
                 containment: "#features-detect"
             })
 
@@ -286,7 +359,52 @@ $('.draggable').collidify(options, {
                     $('.drag-text').html(count + 1)
                 }
             }, {
+                scroll: false,
                 containment: "#features-drag"
+            })
+
+            $('.inside-obstacle').height("100%");
+            $('.inside-draggable').collidify({
+                collides: [ {
+                    element: $('.inside-obstacle'), //Elements to collide with
+                    type: "inside" //Default is "enter", but "inside" collision works different
+                } ],
+                onCollideEnter: function() { //When Collision Detected:
+                    $('.inside-text').html("Collision!")
+                },
+                onCollideLeave: function() { //When No More Collision:
+                    $('.inside-text').html("No more Collision!")
+                }
+            }, {
+                scroll: false,
+                containment: "#features-inside"
+            })
+
+            $('.border-draggable').collidify({
+                border: [ $('.border-obstacle') ],
+                borderStyle: "2px dashed blue"
+            }, {
+                scroll: false,
+                containment: "#features-border"
+            })
+            $('.revert-draggable').collidify({
+                revert: [ $('.revert-obstacle') ],
+                collides: [
+                    $('.revert-obstacle')
+                ],
+                onCollideEnter: function() { //When Collision Detected:
+                    $('.revert-text').html("Release!")
+                },
+                onRevert: function() { //When No More Collision:
+                    $('.revert-text').html("Drag inside me and Release!")
+                },
+                onCollideLeave: function() {
+                    $('.revert-text').html("Drag inside me and Release!")
+                }
+                
+            }, {
+                scroll: false,
+                containment: "#features-revert"
             })
 
         </script>
