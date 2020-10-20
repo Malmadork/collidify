@@ -12,6 +12,7 @@
         <script src="./prism.js"></script>
     </head>
     <body>
+        <div id=#top style="position: absolute;top:0"></div>
         <style>
             html {
                 scroll-behavior: smooth;
@@ -138,6 +139,19 @@
                 text-decoration: underline;
                 text-decoration-color: rgb(92, 92, 92);
             }
+            .scrollup {
+                width: 60px;
+                height: 60px;
+                opacity: 1;
+                position: fixed;
+                bottom: 50px;
+                right: 50px;
+                display: none;
+                z-index: 2;
+                opacity: .4;
+                /* background: url('./icon_up.png') no-repeat; */
+            }
+
         </style>
 
         <div id="header">
@@ -311,10 +325,22 @@ $('.draggable').collidify(options, {
     containment: ".container"
 })</code></pre>
 
+
+<a href="#header" class="scrollup"><img src="./icon_up.png" width=60px height=60px></a>
             
         </div>
         
         <script>
+
+     $(window).scroll(function () {
+         if ($(this).scrollTop() > 100) {
+             //console.log("ol")
+             $('.scrollup').fadeIn();
+         } else {
+             $('.scrollup').fadeOut();
+         }
+     });
+     
 
             window.onload = function() {
                 
