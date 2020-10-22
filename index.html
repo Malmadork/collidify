@@ -214,9 +214,9 @@
             <h4 class="mini-underline">Options</h4>
             <p>The collisionOptions parameter can take several options pertaining to collision events, and can be mix and matched. However, 
                 if borderStyle is used, borderClass does not need to be used.</p>
-            <pre class="language-javascript"><code>collides: [], // An array of elements that trigger collision events
-revert:   [], // An array of elements that will revert position if dragged over
-border:   [], // Lists the items that that will receive a border when the element is dragged over
+            <pre class="language-javascript"><code>collides: [] || $(), // An array of elements, or an element that trigger collision events
+revert:   [] || $(), // An array of elements, or an element that will revert position if dragged over
+border:   [] || $(), // Lists the items, or an item that will receive a border when the element is dragged over
 borderStyle: "2px dashed blue", //The style for border events
 borderClass: ".border", //A class for border events</code></pre>
 
@@ -259,7 +259,7 @@ onEnd() {}, // Triggers when dragging ends (used in collisionOptions)</code></pr
                 </div>
             </div>
             <pre class="language-javascript"><code>var options = {
-    collides: [ $('.obstacle') ], //Elements to collide with
+    collides: $('.obstacle'), //Elements to collide with
     onCollideEnter: function() { //When Collision Detected:
         $('.obstacle-text').html("Collision!")
     },
@@ -284,7 +284,7 @@ $('.draggable').collidify(options, {
                 </div>
             </div>
             <pre class="language-javascript"><code>var options = {
-    collides: [ $('.obstacle') ], //Elements to collide with
+    collides: $('.obstacle'), //Elements to collide with
     onCollide: function() {
         let count = parseInt($('.count-text').html());
         $('.count-text').html(count + 1)
@@ -333,7 +333,7 @@ $('.draggable').collidify(options, {
                 </div>
             </div>
             <pre class="language-javascript"><code>var options = {
-    border: [ $('.obstacle') ],
+    border: $('.obstacle'),
     borderStyle: "2px dashed blue"
 }
 
@@ -352,7 +352,7 @@ $('.draggable').collidify(options, {
                 </div>
             </div>
             <pre class="language-javascript"><code>var options = {
-    revert: [ $('.obstacle') ]
+    revert: $('.obstacle')
 }
 
 $('.draggable').collidify(options, {

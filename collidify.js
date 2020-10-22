@@ -12,7 +12,7 @@
                 }
             }
             else {
-                console.error("OPTIONS.revert must be of type array.")
+                $.fn.collidify.preBorderStyles = $.fn.collidify.getPreborderStyle(collisions.border);
             }
         }
         var events = {
@@ -36,7 +36,7 @@
                 if(collisions.collides) {
                     if(Array.isArray(collisions.collides)) {
                         if(collisions.collides.length > 0) {
-                            if($.fn.collidify.checkCollision(collisions.collides)) {
+                            if($.fn.collidify.checkCollisions(collisions.collides)) {
                                 if(collisions.onCollide) collisions.onCollide();
                                 if(!$.fn.collidify.isCollisionEnter) {
                                     if(collisions.onCollideEnter) collisions.onCollideEnter();
@@ -53,14 +53,27 @@
                         }
                     }
                     else {
-                        console.error("OPTIONS.revert must be of type array.")
+                        if($.fn.collidify.checkCollision(collisions.collides)) {
+                            if(collisions.onCollide) collisions.onCollide();
+                            if(!$.fn.collidify.isCollisionEnter) {
+                                if(collisions.onCollideEnter) collisions.onCollideEnter();
+                                $.fn.collidify.isCollisionEnter = true;
+                                $.fn.collidify.hasCollisionEnterFired = true;
+                            }
+                            
+                        }
+                        else if($.fn.collidify.isCollisionEnter){
+                            if(collisions.onCollideLeave) collisions.onCollideLeave();
+                            $.fn.collidify.isCollisionEnter = false;
+                            $.fn.collidify.hasCollisionEnterFired = false;
+                        }
                     }
                 }
 
                 if(collisions.border) {
                     if(Array.isArray(collisions.border)) {
                         if(collisions.border.length > 0) {
-                            if($.fn.collidify.checkCollision( collisions.border )) {
+                            if($.fn.collidify.checkCollisions( collisions.border )) {
 
                                 
                                 let borderStyle = 
@@ -92,7 +105,34 @@
                         }
                     }
                     else {
-                        console.error("OPTIONS.revert must be of type array.")
+                        let boundType = (typeof collisions.border === 'object' && collisions.border.type) ? collisions.border.type : "enter";
+                        if($.fn.collidify.checkCollision(collisions.border, boundType)) {
+                            let borderStyle = 
+                                ( collisions.borderStyle ? collisions.borderStyle : 
+                                  collisions.borderClass ? $(collisions.borderClass).css("border") :
+                                  "1px solid red");
+
+                            
+                            var collides = $.fn.collidify.getCollisionItem(collisions.border);
+                            if(collides.length > 0) {
+                                collides.forEach(hover => {
+                                    hover.css({border: borderStyle})
+                                })
+                              }
+
+                              if(collisions.onBorder && !$.fn.collidify.hasBorderChangeFired) {
+                                $.fn.collidify.hasBorderChangeFired = true;
+                                collisions.onBorder();
+                            }
+
+                        }
+                        else {
+                                $.fn.collidify.removeBorderFromItem(collisions.border);
+                                if(collisions.onBorderRemove && $.fn.collidify.hasBorderChangeFired) {
+                                    collisions.onBorderRemove();
+                                    $.fn.collidify.hasBorderChangeFired = false;
+                                }
+                            }
                     }
                 }
                         
@@ -103,14 +143,20 @@
                 if(collisions.revert) {
                     if(Array.isArray(collisions.revert) ) {
                         if(collisions.revert.length > 0) {
-                            if($.fn.collidify.checkCollision(collisions.revert)) {
+                            if($.fn.collidify.checkCollisions(collisions.revert)) {
                                 $(this).offset({top:$.fn.collidify.element.originalPosition.top, left:$.fn.collidify.element.originalPosition.left})
                                 if(collisions.onRevert) collisions.onRevert()
                             }
                         }
                     }
                     else {
-                        console.error("OPTIONS.revert must be of type array.")
+                        let arr = [];
+                        arr.push(collisions.revert);
+                        if($.fn.collidify.checkCollisions(arr)) {
+                            
+                            $(this).offset({top:$.fn.collidify.element.originalPosition.top, left:$.fn.collidify.element.originalPosition.left})
+                            if(collisions.onRevert) collisions.onRevert()
+                        }
                     }
                 }
 
@@ -171,7 +217,7 @@
         }
     }
 
-    $.fn.collidify.checkCollision = function(bounds) {
+    $.fn.collidify.checkCollisions = function(bounds) {
         let result = false;
         
         bounds.forEach(bound => {
@@ -180,8 +226,23 @@
                 bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
                 bound.element : null);
 
-            let boundType = (typeof bound === 'object' && bound.type) ? bound.type : "enter"
+                let boundType = (typeof bound === 'object' && bound.type) ? bound.type : "enter"
+                //console.log("hmm")
+                result = $.fn.collidify.checkCollision(boundElement, boundType)
+        })
 
+        return result;
+    }
+
+    $.fn.collidify.checkCollision = function(item, type) {
+        let result = false;
+
+            let boundElement = (typeof item === 'object' && item.selector) ? 
+            item : ((item.element && typeof item.element === 'object' && item.element.selector) ?
+            item.element : null);
+
+            //let boundType = (typeof item === 'object' && item.type) ? item.type : "enter"
+            let boundType = type;
                 if(boundElement !== null) {
                     boundElement.each(function(i, obj) {
                         let obj_offset = $(obj).offset()
@@ -211,7 +272,6 @@
                     
                     })
                 }
-        })
 
         return result;
     }
@@ -240,6 +300,31 @@
                     }
                 })
         })
+
+        return result;
+    }
+
+    $.fn.collidify.getCollisionItem = function(bound) {
+        let result = [];
+            let boundElement = (typeof bound === 'object' && bound.selector) ? 
+                bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
+                bound.element : null);
+
+                boundElement.each(function(i, obj) {
+                    let obj_offset = $(obj).offset()
+                    let w = $(obj).width();
+                    let h = $(obj).height();
+                    let pos = $.fn.collidify.element.newPosition;
+              
+                    if (pos.left < obj_offset.left + w &&
+                        pos.right  > obj_offset.left &&
+                        pos.top < obj_offset.top + h &&
+                        pos.bottom > obj_offset.top) {
+                        
+                            result.push(boundElement);
+                        
+                    }
+                })
 
         return result;
     }
@@ -282,6 +367,42 @@
         })
     }
 
+    $.fn.collidify.removeBorderFromItem = function(item) {
+        
+            let boundElement = (typeof item === 'object' && item.selector) ? 
+                item : ((item.element && typeof item.element === 'object' && item.element.selector) ?
+                item.element : null);
+
+                boundElement.each(function(i, obj) {
+                    let obj_offset = $(obj).offset()
+                    let w = $(obj).width();
+                    let h = $(obj).height();
+                    let pos = $.fn.collidify.element.newPosition;
+              
+                    if (pos.left < obj_offset.left + w &&
+                        pos.right  > obj_offset.left &&
+                        pos.top < obj_offset.top + h &&
+                        pos.bottom > obj_offset.top) {
+
+                    }
+                    else {
+                        
+                        for(var i = 0; i < $.fn.collidify.preBorderStyles.length;i++) {
+                            var style = $.fn.collidify.preBorderStyles[i].style;
+                            if(style !== $.fn.collidify.preBorderStyles[i].element.css("border")) {
+                                $.fn.collidify.isBorderChange = true;
+                            }
+                            else {
+                                $.fn.collidify.isBorderChange = false;
+                            }
+                            $.fn.collidify.preBorderStyles[i].element.css({border: style})
+                            
+                        }
+                        
+                    }
+                })
+    }
+
     $.fn.collidify.getPreborderStyles = function(bounds) {
         let result = [];
         bounds.forEach(bound => {
@@ -298,6 +419,24 @@
             })
             
         })
+
+        return result;
+    }
+
+    $.fn.collidify.getPreborderStyle = function(item) {
+        var result = [];
+            let boundElement = (typeof item === 'object' && item.selector) ? 
+                item : ((item.element && typeof item.element === 'object' && item.element.selector) ?
+                item.element : null);
+
+            boundElement.each(function(i, obj) {
+                result.push({
+                    element: $(obj),
+                    style: $(obj).css("border")
+                })
+            })
+            
+        
 
         return result;
     }
