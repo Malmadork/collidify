@@ -1,182 +1,366 @@
 (function( $ ) {
- 
-    $.fn.collidify = function( cols, draggableopts ) {
- 
-        var collisions = $.extend( {}, $.fn.collidify.collisions, cols );
-        var dragopts = $.extend( {}, $.fn.collidify.dragopts, draggableopts );
 
-        if(collisions.border) {
-            if(Array.isArray(collisions.border)) {
-                if(collisions.border.length > 0) {
-                    $.fn.collidify.preBorderStyles = $.fn.collidify.getPreborderStyles(collisions.border);
-                }
-            }
-            else {
-                $.fn.collidify.preBorderStyles = $.fn.collidify.getPreborderStyle(collisions.border);
-            }
-        }
+    $.fn.collidifyBETA = function( collisionOptions, draggableOptions) {
+        
+        var CollisionOptions = $.extend( {}, $.fn.collidifyBETA.CollisionOptions, collisionOptions );
+        var DraggableOptions = $.extend( {}, $.fn.collidifyBETA.DraggableOptions, draggableOptions );
+
+        
+       
         var events = {
             start: function() {
-                $.fn.collidify.element.originalPosition.top = $(this).offset().top;
-                $.fn.collidify.element.originalPosition.left = $(this).offset().left;
-                $.fn.collidify.element.originalPosition.bottom = $(this).offset().top + $(this).height();
-                $.fn.collidify.element.originalPosition.right = $(this).offset().left + $(this).width(); 
-                
-                collisions.onStart();
-
-                
-                
+                if($.fn.collidifyBETA.CollisionItems.length > 0) {
+                    $.fn.collidifyBETA.CollisionItems.forEach(item => {
+                        item.position.originalPosition.top = $(this).offset().top;
+                        item.position.originalPosition.left = $(this).offset().left;
+                        item.position.originalPosition.bottom = $(this).offset().top + $(this).height();
+                        item.position.originalPosition.right = $(this).offset().left + $(this).width(); 
+                    }) 
+                }
+                if($.fn.collidifyBETA.BorderItems.length > 0) {
+                    $.fn.collidifyBETA.BorderItems.forEach(item => {
+                        item.position.originalPosition.top = $(this).offset().top;
+                        item.position.originalPosition.left = $(this).offset().left;
+                        item.position.originalPosition.bottom = $(this).offset().top + $(this).height();
+                        item.position.originalPosition.right = $(this).offset().left + $(this).width(); 
+                    }) 
+                }
+                if($.fn.collidifyBETA.RevertItems.length > 0) {
+                    $.fn.collidifyBETA.RevertItems.forEach(item => {
+                        item.position.originalPosition.top = $(this).offset().top;
+                        item.position.originalPosition.left = $(this).offset().left;
+                        item.position.originalPosition.bottom = $(this).offset().top + $(this).height();
+                        item.position.originalPosition.right = $(this).offset().left + $(this).width(); 
+                    }) 
+                }
+                CollisionOptions.onStart();
             },
             drag: function() {
-                $.fn.collidify.element.newPosition.top = $(this).offset().top;
-                $.fn.collidify.element.newPosition.left = $(this).offset().left;
-                $.fn.collidify.element.newPosition.bottom = $(this).offset().top + $(this).height();
-                $.fn.collidify.element.newPosition.right = $(this).offset().left + $(this).width(); 
-                collisions.onDrag();
-                if(collisions.collides) {
-                    if(Array.isArray(collisions.collides)) {
-                        if(collisions.collides.length > 0) {
-                            if($.fn.collidify.checkCollisions(collisions.collides)) {
-                                if(collisions.onCollide) collisions.onCollide();
-                                if(!$.fn.collidify.isCollisionEnter) {
-                                    if(collisions.onCollideEnter) collisions.onCollideEnter();
-                                    $.fn.collidify.isCollisionEnter = true;
-                                    $.fn.collidify.hasCollisionEnterFired = true;
-                                }
-                                
+                CollisionOptions.onDrag();
+
+                if($.fn.collidifyBETA.CollisionItems.length > 0) {
+                    $.fn.collidifyBETA.CollisionItems.forEach(item => {
+
+                        item.position.newPosition.top = $(this).offset().top;
+                        item.position.newPosition.left = $(this).offset().left;
+                        item.position.newPosition.bottom = $(this).offset().top + $(this).height();
+                        item.position.newPosition.right = $(this).offset().left + $(this).width(); 
+
+                        if($.fn.collidifyBETA.hasCollision(item.element, item.type, item.position)) {
+                            if(CollisionOptions.onCollide) CollisionOptions.onCollide();
+
+                            if(!item.isColliding) {
+                                if(CollisionOptions.onCollideEnter) CollisionOptions.onCollideEnter();
+                                item.isColliding = true;
                             }
-                            else if($.fn.collidify.isCollisionEnter){
-                                if(collisions.onCollideLeave) collisions.onCollideLeave();
-                                $.fn.collidify.isCollisionEnter = false;
-                                $.fn.collidify.hasCollisionEnterFired = false;
-                            }
+
                         }
-                    }
-                    else {
-                        if($.fn.collidify.checkCollision(collisions.collides)) {
-                            if(collisions.onCollide) collisions.onCollide();
-                            if(!$.fn.collidify.isCollisionEnter) {
-                                if(collisions.onCollideEnter) collisions.onCollideEnter();
-                                $.fn.collidify.isCollisionEnter = true;
-                                $.fn.collidify.hasCollisionEnterFired = true;
-                            }
-                            
+                        else if(item.isColliding) {
+                            if(CollisionOptions.onCollideLeave) CollisionOptions.onCollideLeave();
+                            item.isColliding = false
                         }
-                        else if($.fn.collidify.isCollisionEnter){
-                            if(collisions.onCollideLeave) collisions.onCollideLeave();
-                            $.fn.collidify.isCollisionEnter = false;
-                            $.fn.collidify.hasCollisionEnterFired = false;
-                        }
-                    }
+                    }) 
                 }
-
-                if(collisions.border) {
-                    if(Array.isArray(collisions.border)) {
-                        if(collisions.border.length > 0) {
-                            if($.fn.collidify.checkCollisions( collisions.border )) {
-
-                                
-                                let borderStyle = 
-                                ( collisions.borderStyle ? collisions.borderStyle : 
-                                  collisions.borderClass ? $(collisions.borderClass).css("border") :
-                                  "1px solid red");
-
-                                
-                                  
-                                  var collides = $.fn.collidify.getCollisionItems(collisions.border);
-                                  if(collides.length > 0) {
-                                    collides.forEach(hover => {
-                                        hover.css({border: borderStyle})
-                                    })
-                                  }
-                                
-                                if(collisions.onBorder && !$.fn.collidify.hasBorderChangeFired) {
-                                    $.fn.collidify.hasBorderChangeFired = true;
-                                    collisions.onBorder();
-                                } 
-                            }
-                            else {
-                                $.fn.collidify.removeBorder(collisions.border);
-                                if(collisions.onBorderRemove && $.fn.collidify.hasBorderChangeFired) {
-                                    collisions.onBorderRemove();
-                                    $.fn.collidify.hasBorderChangeFired = false;
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        let boundType = (typeof collisions.border === 'object' && collisions.border.type) ? collisions.border.type : "enter";
-                        if($.fn.collidify.checkCollision(collisions.border, boundType)) {
-                            let borderStyle = 
-                                ( collisions.borderStyle ? collisions.borderStyle : 
-                                  collisions.borderClass ? $(collisions.borderClass).css("border") :
-                                  "1px solid red");
-
-                            
-                            var collides = $.fn.collidify.getCollisionItem(collisions.border);
-                            if(collides.length > 0) {
-                                collides.forEach(hover => {
-                                    hover.css({border: borderStyle})
-                                })
-                              }
-
-                              if(collisions.onBorder && !$.fn.collidify.hasBorderChangeFired) {
-                                $.fn.collidify.hasBorderChangeFired = true;
-                                collisions.onBorder();
-                            }
-
-                        }
-                        else {
-                                $.fn.collidify.removeBorderFromItem(collisions.border);
-                                if(collisions.onBorderRemove && $.fn.collidify.hasBorderChangeFired) {
-                                    collisions.onBorderRemove();
-                                    $.fn.collidify.hasBorderChangeFired = false;
-                                }
-                            }
-                    }
-                }
+                if($.fn.collidifyBETA.BorderItems.length > 0) {
+                    $.fn.collidifyBETA.BorderItems.forEach(item => {
+                        //if(item.borderStyle) console.log(item.borderStyle)
+                        let borderStyle = item.borderStyle
                         
+
+                        item.position.newPosition.top = $(this).offset().top;
+                        item.position.newPosition.left = $(this).offset().left;
+                        item.position.newPosition.bottom = $(this).offset().top + $(this).height();
+                        item.position.newPosition.right = $(this).offset().left + $(this).width(); 
+
+                        if($.fn.collidifyBETA.hasCollision(item.element, item.type, item.position)) {
+                            
+                            if(!item.isColliding) {
+                                item.isColliding = true;
+                                if(CollisionOptions.onBorder) CollisionOptions.onBorder();
+                                item.element.css({border: borderStyle})
+                            }
+                            
+
+                        }
+                        else if(item.isColliding) {
+                            if(CollisionOptions.onBorderRemove) CollisionOptions.onBorderRemove();
+                            item.isColliding = false
+                            item.element.css({border: item.preBorderStyle})
+                        }
+                    }) 
+                }
+
+                if($.fn.collidifyBETA.RevertItems.length > 0) {
+                    $.fn.collidifyBETA.RevertItems.forEach(item => {
+                        item.position.newPosition.top = $(this).offset().top;
+                        item.position.newPosition.left = $(this).offset().left;
+                        item.position.newPosition.bottom = $(this).offset().top + $(this).height();
+                        item.position.newPosition.right = $(this).offset().left + $(this).width();
+                    });
+                }
 
             },
             stop: function() {
 
-                if(collisions.revert) {
-                    if(Array.isArray(collisions.revert) ) {
-                        if(collisions.revert.length > 0) {
-                            if($.fn.collidify.checkCollisions(collisions.revert)) {
-                                $(this).offset({top:$.fn.collidify.element.originalPosition.top, left:$.fn.collidify.element.originalPosition.left})
-                                if(collisions.onRevert) collisions.onRevert()
-                            }
+                if($.fn.collidifyBETA.RevertItems.length > 0) {
+                    $.fn.collidifyBETA.RevertItems.forEach(item => {
+                        if($.fn.collidifyBETA.hasCollision(item.element, item.type, item.position)) {
+                            $(this).offset({top:item.position.originalPosition.top, left:item.position.originalPosition.left})
+                                if(CollisionOptions.onRevert) CollisionOptions.onRevert()
+                            item.element.css("border", item.preBorderStyle)
                         }
-                    }
-                    else {
-                        let arr = [];
-                        arr.push(collisions.revert);
-                        if($.fn.collidify.checkCollisions(arr)) {
-                            
-                            $(this).offset({top:$.fn.collidify.element.originalPosition.top, left:$.fn.collidify.element.originalPosition.left})
-                            if(collisions.onRevert) collisions.onRevert()
-                        }
-                    }
+                    })
                 }
-
-                collisions.onEnd();
+    
+                CollisionOptions.onEnd();
             }
         }
- 
-        var eventopts = $.extend( {}, dragopts, events );
+
+        var eventopts = $.extend( {}, DraggableOptions, events );
         
 
         if($.ui === undefined || !$.ui.version) {
             return console.error("collidify.js requires jquery.ui to function!")
         }
         else {
+            if(CollisionOptions.collides) {
+                if(Array.isArray(CollisionOptions.collides)) {
+                    if(CollisionOptions.collides.length > 0) {
+                        CollisionOptions.collides.forEach(item => {
+                            
+                            let obj = (typeof item === 'object' && item.selector) ? 
+        {
+            type: (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+            element: item,
+            position: {
+                originalPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                },
+                newPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                }
+            },
+            isColliding: false
+        } : ((item.element && typeof item.element === 'object' && item.element.selector) ?
+        {
+            type: (item.type != undefined) ? item.type : (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+            element: item.element,
+            position: {
+                originalPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                },
+                newPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                }
+            },
+            isColliding: false
+        } : null);
+
+                            if(obj !== null) $.fn.collidifyBETA.CollisionItems.push(obj)
+                        })
+                    }
+                }
+                else {
+                    let obj = {
+                        type: (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+                        element: CollisionOptions.collides,
+                        position: {
+                            originalPosition: {
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0
+                            },
+                            newPosition: {
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0
+                            }
+                        },
+                        isColliding: false
+                    }
+                    if(obj !== null) $.fn.collidifyBETA.CollisionItems.push(obj)
+                }
+            }
+            if(CollisionOptions.border) {
+                if(Array.isArray(CollisionOptions.border)) {
+                    if(CollisionOptions.border.length > 0) {
+                        CollisionOptions.border.forEach(item => {
+                            
+                            let obj = (typeof item === 'object' && item.selector) ? 
+        {
+            type: (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+            element: item,
+            position: {
+                originalPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                },
+                newPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                }
+            },
+            preBorderStyle: item.css("border"),
+            borderStyle: CollisionOptions.borderStyle ? CollisionOptions.borderStyle :
+                collisions.borderClass ? $(collisions.borderClass).css("border") :
+                "1px solid red",
+            isColliding: false
+        } : ((item.element && typeof item.element === 'object' && item.element.selector) ?
+        {
+            type: (item.type != undefined) ? item.type : (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+            element: item.element,
+            position: {
+                originalPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                },
+                newPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                }
+            },
+            preBorderStyle: item.element.css("border"),
+            borderStyle: ( item.borderStyle ? item.borderStyle : 
+                CollisionOptions.borderStyle ? CollisionOptions.borderStyle :
+                collisions.borderClass ? $(collisions.borderClass).css("border") :
+                "1px solid red"),
+            isColliding: false
+        } : null);
+
+                            if(obj !== null) $.fn.collidifyBETA.BorderItems.push(obj)
+                        })
+                    }
+                }
+                else {
+                    let obj = {
+                        type: (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+                        element: CollisionOptions.border,
+                        position: {
+                            originalPosition: {
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0
+                            },
+                            newPosition: {
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0
+                            }
+                        },
+                        preBorderStyle: CollisionOptions.border.css("border"),
+                        borderStyle: CollisionOptions.borderStyle ? CollisionOptions.borderStyle :
+                collisions.borderClass ? $(collisions.borderClass).css("border") :
+                "1px solid red",
+                        isColliding: false
+                    }
+                    if(obj !== null) $.fn.collidifyBETA.BorderItems.push(obj)
+                }
+            }
+            if(CollisionOptions.revert) {
+                if(Array.isArray(CollisionOptions.revert)) {
+                    if(CollisionOptions.revert.length > 0) {
+                        CollisionOptions.revert.forEach(item => {
+                            
+                            let obj = (typeof item === 'object' && item.selector) ? 
+        {
+            type: (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+            element: item,
+            position: {
+                originalPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                },
+                newPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                }
+            },
+            preBorderStyle: item.css("border"),
+            isColliding: false
+        } : ((item.element && typeof item.element === 'object' && item.element.selector) ?
+        {
+            type: (item.type != undefined) ? item.type : (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+            element: item.element,
+            position: {
+                originalPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                },
+                newPosition: {
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0
+                }
+            },
+            preBorderStyle: item.element.css("border"),
+            isColliding: false
+        } : null);
+
+                            if(obj !== null) $.fn.collidifyBETA.RevertItems.push(obj)
+                        })
+                    }
+                }
+                else {
+                    let obj = {
+                        type: (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+                        element: CollisionOptions.revert,
+                        position: {
+                            originalPosition: {
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0
+                            },
+                            newPosition: {
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                right: 0
+                            }
+                        },
+                        preBorderStyle: CollisionOptions.revert.css("border"),
+                        isColliding: false
+                    }
+                    if(obj !== null) $.fn.collidifyBETA.RevertItems.push(obj)
+                }
+            }
+            
             return this.draggable(eventopts)
         }
+    }
 
-    };
-
-    $.fn.collidify.collisions = {
+    $.fn.collidifyBETA.CollisionOptions = {
         onStart: function() {
 
         },
@@ -188,9 +372,24 @@
         },
         onCollide: function() {
 
-        }
+        },
+        onRevert: function() {
+
+        },
+        onBorder: function() {
+
+        }, 
+        onBorderRemove: function() {
+
+        }, 
+        onCollideEnter: function() {
+
+        }, 
+        onCollideLeave: function() {
+
+        },
     };
-    $.fn.collidify.dragopts = {
+    $.fn.collidifyBETA.DraggableOptions = {
         start: function() {
 
         },
@@ -202,250 +401,53 @@
         }
     };
 
-    $.fn.collidify.element = {
-        originalPosition: {
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0
-        },
-        newPosition: {
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0
-        }
-    }
+    $.fn.collidifyBETA.CollisionItems = [];
+    $.fn.collidifyBETA.BorderItems = [];
+    $.fn.collidifyBETA.RevertItems = [];
 
-    $.fn.collidify.checkCollisions = function(bounds) {
+    $.fn.collidifyBETA.hasCollision = (item, type, position) => {
         let result = false;
+
         
-        bounds.forEach(bound => {
 
-            let boundElement = (typeof bound === 'object' && bound.selector) ? 
-                bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
-                bound.element : null);
+        let boundElement = (typeof item === 'object' && item.selector) ? 
+        item : ((item.element && typeof item.element === 'object' && item.element.selector) ?
+        item.element : null);
 
-                let boundType = (typeof bound === 'object' && bound.type) ? bound.type : "enter"
-                //console.log("hmm")
-                result = $.fn.collidify.checkCollision(boundElement, boundType)
-        })
-
-        return result;
-    }
-
-    $.fn.collidify.checkCollision = function(item, type) {
-        let result = false;
-
-            let boundElement = (typeof item === 'object' && item.selector) ? 
-            item : ((item.element && typeof item.element === 'object' && item.element.selector) ?
-            item.element : null);
-
-            //let boundType = (typeof item === 'object' && item.type) ? item.type : "enter"
-            let boundType = type;
-                if(boundElement !== null) {
-                    boundElement.each(function(i, obj) {
-                        let obj_offset = $(obj).offset()
-                    let w = $(obj).width();
-                    let h = $(obj).height();
-                    let pos = $.fn.collidify.element.newPosition;
-              
-                    if(boundType == "enter") {
-                        if (pos.left < obj_offset.left + w &&
-                            pos.right  > obj_offset.left &&
-                            pos.top < obj_offset.top + h &&
-                            pos.bottom > obj_offset.top) {
-                            
-                                result = true;
-                            
-                        }
-                    }
-                    else if(boundType == "inside") {
-                        if (pos.right < obj_offset.left + w &&
-                            pos.left  > obj_offset.left &&
-                            pos.bottom < obj_offset.top + h &&
-                            pos.top > obj_offset.top) {
-                            
-                                result = true;
-                        }
-                    }
+        let boundType = type;
+        if(boundElement !== null) {
+            
+                boundElement.each(function(i, obj) {
                     
-                    })
+                    let obj_offset = $(obj).offset()
+                let w = $(obj).width();
+                let h = $(obj).height();
+                let pos = position.newPosition;
+          
+                if(boundType == "enter") {
+                    if (pos.left < obj_offset.left + w &&
+                        pos.right  > obj_offset.left &&
+                        pos.top < obj_offset.top + h &&
+                        pos.bottom > obj_offset.top) {
+                        
+                            result = true;
+                        
+                    }
                 }
-
-        return result;
-    }
-
-    $.fn.collidify.getCollisionItems = function(bounds) {
-        let result = [];
-        bounds.forEach(bound => {
-
-            let boundElement = (typeof bound === 'object' && bound.selector) ? 
-                bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
-                bound.element : null);
-
-                boundElement.each(function(i, obj) {
-                    let obj_offset = $(obj).offset()
-                    let w = $(obj).width();
-                    let h = $(obj).height();
-                    let pos = $.fn.collidify.element.newPosition;
-              
-                    if (pos.left < obj_offset.left + w &&
-                        pos.right  > obj_offset.left &&
-                        pos.top < obj_offset.top + h &&
-                        pos.bottom > obj_offset.top) {
+                else if(boundType == "inside") {
+                    if (pos.right < obj_offset.left + w &&
+                        pos.left  > obj_offset.left &&
+                        pos.bottom < obj_offset.top + h &&
+                        pos.top > obj_offset.top) {
                         
-                            result.push(boundElement);
-                        
+                            result = true;
                     }
+                }
+                
                 })
-        })
+            }
 
-        return result;
+    return result;
     }
 
-    $.fn.collidify.getCollisionItem = function(bound) {
-        let result = [];
-            let boundElement = (typeof bound === 'object' && bound.selector) ? 
-                bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
-                bound.element : null);
-
-                boundElement.each(function(i, obj) {
-                    let obj_offset = $(obj).offset()
-                    let w = $(obj).width();
-                    let h = $(obj).height();
-                    let pos = $.fn.collidify.element.newPosition;
-              
-                    if (pos.left < obj_offset.left + w &&
-                        pos.right  > obj_offset.left &&
-                        pos.top < obj_offset.top + h &&
-                        pos.bottom > obj_offset.top) {
-                        
-                            result.push(boundElement);
-                        
-                    }
-                })
-
-        return result;
-    }
-
-    $.fn.collidify.removeBorder = function(bounds) {
-        bounds.forEach(bound => {
-
-            let boundElement = (typeof bound === 'object' && bound.selector) ? 
-                bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
-                bound.element : null);
-
-                boundElement.each(function(i, obj) {
-                    let obj_offset = $(obj).offset()
-                    let w = $(obj).width();
-                    let h = $(obj).height();
-                    let pos = $.fn.collidify.element.newPosition;
-              
-                    if (pos.left < obj_offset.left + w &&
-                        pos.right  > obj_offset.left &&
-                        pos.top < obj_offset.top + h &&
-                        pos.bottom > obj_offset.top) {
-
-                    }
-                    else {
-                        
-                        for(var i = 0; i < $.fn.collidify.preBorderStyles.length;i++) {
-                            var style = $.fn.collidify.preBorderStyles[i].style;
-                            if(style !== $.fn.collidify.preBorderStyles[i].element.css("border")) {
-                                $.fn.collidify.isBorderChange = true;
-                            }
-                            else {
-                                $.fn.collidify.isBorderChange = false;
-                            }
-                            $.fn.collidify.preBorderStyles[i].element.css({border: style})
-                            
-                        }
-                        
-                    }
-                })
-        })
-    }
-
-    $.fn.collidify.removeBorderFromItem = function(item) {
-        
-            let boundElement = (typeof item === 'object' && item.selector) ? 
-                item : ((item.element && typeof item.element === 'object' && item.element.selector) ?
-                item.element : null);
-
-                boundElement.each(function(i, obj) {
-                    let obj_offset = $(obj).offset()
-                    let w = $(obj).width();
-                    let h = $(obj).height();
-                    let pos = $.fn.collidify.element.newPosition;
-              
-                    if (pos.left < obj_offset.left + w &&
-                        pos.right  > obj_offset.left &&
-                        pos.top < obj_offset.top + h &&
-                        pos.bottom > obj_offset.top) {
-
-                    }
-                    else {
-                        
-                        for(var i = 0; i < $.fn.collidify.preBorderStyles.length;i++) {
-                            var style = $.fn.collidify.preBorderStyles[i].style;
-                            if(style !== $.fn.collidify.preBorderStyles[i].element.css("border")) {
-                                $.fn.collidify.isBorderChange = true;
-                            }
-                            else {
-                                $.fn.collidify.isBorderChange = false;
-                            }
-                            $.fn.collidify.preBorderStyles[i].element.css({border: style})
-                            
-                        }
-                        
-                    }
-                })
-    }
-
-    $.fn.collidify.getPreborderStyles = function(bounds) {
-        let result = [];
-        bounds.forEach(bound => {
-
-            let boundElement = (typeof bound === 'object' && bound.selector) ? 
-                bound : ((bound.element && typeof bound.element === 'object' && bound.element.selector) ?
-                bound.element : null);
-
-            boundElement.each(function(i, obj) {
-                result.push({
-                    element: $(obj),
-                    style: $(obj).css("border")
-                })
-            })
-            
-        })
-
-        return result;
-    }
-
-    $.fn.collidify.getPreborderStyle = function(item) {
-        var result = [];
-            let boundElement = (typeof item === 'object' && item.selector) ? 
-                item : ((item.element && typeof item.element === 'object' && item.element.selector) ?
-                item.element : null);
-
-            boundElement.each(function(i, obj) {
-                result.push({
-                    element: $(obj),
-                    style: $(obj).css("border")
-                })
-            })
-            
-        
-
-        return result;
-    }
-
-    $.fn.collidify.preBorderStyles = [];
-    $.fn.collidify.isBorderChange = false;
-    $.fn.collidify.hasBorderChangeFired = false;
-    $.fn.collidify.isCollisionEnter = false;
-    $.fn.collidify.hasCollisionEnterFired = false;
-      
- 
 }( jQuery ));
