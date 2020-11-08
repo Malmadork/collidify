@@ -9,6 +9,7 @@ During the process of working one of my projects, I really wanted to have dragga
 # Documentation
 collidify requires you to have jQuery and jQuery UI in order to properly use the plugin! 
 
+I highly recommend you check out the full docs for more information, examples, and more!
 Full Documentation at: https://malmadork.github.io/collidify/index.html
 
 jQuery CDN Links:<br>
@@ -144,12 +145,27 @@ var options = {
 $('.draggable').collidify(options);
 ```
 
+Example 7: Custom border options
+```js
+var options = {
+    border: [ 
+        $('.border-1'),
+        {
+            element: $('.border-2'),
+            borderStyle: "2px dashed purple" // Has priority over the style "1px solid blue"
+        }
+    ],
+    borderStyle: "1px solid blue"
+}
+$('.draggable').collidify(options);
+```
+
 # Options
 
 ```js
-collides: [], // Lists the items that the element will trigger collision events with
-revert:   [], // Lists the items that the element will revert position if dragged over
-border:   [], // Lists the items that that will receive a border when the element is dragged over
+collides: [] || $, // Array or element of the item(s) to collide with
+revert:   [] || $, // Array or element of the item(s) that will revert position
+border:   [] || $, // Array or element of the item(s) that will receive a border when dragged over
 onCollide() {}, //Triggers whenever an element collides with a listed element. TRIGGERS ON DRAG!
 onRevert()  {}, //Triggers whenever an element is reverted from a listed element
 onBorder()  {}, //Triggers whenever a listed element receives a border
@@ -164,6 +180,4 @@ borderClass: ".border", //A class for border events
 onStart() {}, // Triggers when dragging starts (used in the first parameter)
 onDrag() {}, // Triggers when dragging (used in the first parameter)
 onEnd() {}, // Triggers when dragging ends (used in the first parameter)
-
-
 ```
