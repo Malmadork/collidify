@@ -54,6 +54,14 @@
                 right:0;
                 background-color: #ccc;
             }
+            .obstacle2 {
+                height:150px;
+                width:150px;
+                position:absolute;
+                top:0;
+                right:0;
+                background-color: #ccc;
+            }
             .border {
                 border: 1px solid black;
                 height:100px;
@@ -174,6 +182,8 @@
                 <a href="#getstarted"><u>Get Started</u></a>
                 <a href="#docs"><u>Documentation</u></a>
                 <a href="#examples"><u>Examples</u></a>
+                <a href="#other"><u>Other Properties</u></a>
+                <a href="#changelog"><u>Changelog</u></a>
             </div>
 
             <h1 class="underline-title" id="whatis">What is collidify?</h1>
@@ -234,6 +244,30 @@ onCollideLeave() {}, // A function trat triggers whenever an element leaves coll
 onStart() {}, // Triggers when dragging starts (used in collisionOptions)
 onDrag() {}, // Triggers when dragging (used in collisionOptions)
 onEnd() {}, // Triggers when dragging ends (used in collisionOptions)</code></pre>
+
+            <h4 class="mini-underline">Array+Object Options</h4>
+            <p>Within the collides, border, or revert arrays, you can use objects to define certain fields. element is required when using objects, type defaults to enter, and borderStyle defaults to "1px solid red".</p>   
+            <pre class="language-javascript"><code>//Examples of using objects within arrays.
+collides: [
+    {
+        element: $('.draggable-collides'),
+        type: "enter" | "inside" //Enter detects collision when the item enters, inside when fully inside.
+    }
+]
+border: [
+    {
+        element: $('.draggable-border'),
+        type: "enter" | "inside" //Enter detects collision when the item enters, inside when fully inside.
+        borderStyle: "2px dashed purple" //Any CSS string to apply to the border
+    }
+]
+border: [
+    {
+        element: $('.draggable-border'),
+        type: "enter" | "inside" //Enter detects collision when the item enters, inside when fully inside.
+    }
+]
+</code></pre>
 
             <h1 class="underline-title" id="examples">Examples</h1>
             <h3 class="mini-underline">Creating Draggables</h3>
@@ -359,6 +393,68 @@ $('.draggable').collidify(options, {
     containment: ".container"
 })</code></pre>
 
+<h3 class="mini-underline">Multiple Seperate Collisions</h3>
+            <p>Properties can be mixed and matched, and even customized to your liking!</p>
+            <div id="features-multiple" class="container">
+                <div class="multiple-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+                <div class="multiple-obstacle obstacle">
+                    <p style="text-align: center;color:black" class="multiple-text">Drag inside me for border 1!</p>
+                </div>
+                <div class="multiple-obstacle2 obstacle2">
+                    <p style="text-align: center;color:black" class="multiple-text">Drag inside me for border 2!</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>var options = {
+    border: [
+        $('.obstacle'), 
+        {
+            element:$('.obstacle2'),
+            borderStyle: "3px solid green"
+        }
+    ],
+    revert: [
+        $('.obstacle'), 
+        $('.obstacle2')
+    ],
+    borderStyle: "2px dashed blue"
+}
+
+$('.draggable').collidify(options, {
+    containment: ".container"
+})</code></pre>
+
+<h1 class="underline-title" id="other">Other Properties</h1>
+<h5>Collidify has some other variables that may not be as of much use to many, but I would still like to point them out here:</h5>
+<p><u>Variables for getting collision items:</u></p>
+<ul>
+    <li>$.fn.collidify.CollisionItems - Returns an array of all the items checking for collision</li>
+    <li>$.fn.collidify.BorderItems - Returns an array of all the items checking for border</li>
+    <li>$.fn.collidify.RevertItems - Returns an array of all the items checking for border</li>
+</ul>
+<p><u>Variables related to events/options:</u></p>
+<ul>
+    <li>$.fn.collidify.CollisionOptions - Returns an object of all the default event functions.</li>
+    <li>$.fn.collidify.draggableOptions - Returns an object of all the default draggable functions</li>
+</ul>
+<p><u>Checking Collision:</u></p>
+<ul>
+    <li>$.fn.collidify.hasCollision - The function that checks collision of an item.</li>
+</ul>
+
+<h1 class="underline-title" id="changelog">Changelog</h1>
+<h4>Major Changes:</h4>
+<ul>
+    <li>Using arrays with collidify selectors was fixed, and improved to be more customizable.</li>
+    <li>Fixed methods for simplicity, and made fields more straightforward.</li>
+</ul>
+<h4>Upcoming Updates:</h4>
+<ul>
+    <li>More optimization</li>
+    <li>More customization</li>
+</ul>
+
 
 <a href="#header" class="scrollup"><img src="icon_up.png" width=60px height=60px></a>
             
@@ -466,6 +562,25 @@ $('.draggable').collidify(options, {
                 scroll: false,
                 containment: "#features-revert"
             })
+
+
+$('.multiple-draggable').collidify({
+    border: [
+        $('.multiple-obstacle'), 
+        {
+            element:$('.multiple-obstacle2'),
+            type: "enter",
+            borderStyle: "3px solid green"
+        }
+    ],
+    revert: [
+        $('.multiple-obstacle'), 
+        $('.multiple-obstacle2')
+    ],
+    borderStyle: "2px dashed blue"
+}, {
+    containment: "#features-multiple"
+})
 
         </script>
     </body>
