@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:700,600" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" type="text/css">
+        <script src="./collidify.js"></script>
+        
+        <link rel="stylesheet" href="./prism.css">
+        <script src="./prism.js"></script>
+
+        <title>Collidify.js - Malmadork</title>
+        <meta property="og:title" content="collidify.js">
+        <meta property="og:description" content="collidify.js is a jQuery plugin that handles jQuery UI draggable collision events.">
+        <meta property="og:image" content="https://malmadork.github.io/collidify/meta-icon.png" >
+        <meta property="og:url" content="https://malmadork.github.io/collidify/index.html">
+    </head>
+    <body>
+        <div id=#top style="position: absolute;top:0"></div>
+        <style>
+            html {
+                scroll-behavior: smooth;
+            }
+            body {
+                background-color: #252525;
+                color:#F0E7d5;
+                padding:0%;
+            }
+            .container {
+                border: 1px solid black;
+                width:50vw;
+                height:50vh;
+                position: relative;
+                background-color: #707070;
+                border-radius: 10px;
+            }
+
+            .draggable {
+                border: 1px solid green;
+                height:100px;
+                width:100px;
+                background-color: #aaa;
+                border-radius: 5px;
+                z-index: 1;
+            }
+            .obstacle {
+                border: 1px solid red;
+                height:150px;
+                width:150px;
+                position:absolute;
+                bottom:0;
+                right:0;
+                background-color: #ccc;
+            }
+            .obstacle2 {
+                height:150px;
+                width:150px;
+                position:absolute;
+                top:0;
+                right:0;
+                background-color: #ccc;
+            }
+            .border {
+                border: 1px solid black;
+                height:100px;
+                width:100px;
+                position:absolute;
+                top:0;
+                right:0;
+            }
+            #header {
+                background-color: #353535;
+                width:100%;
+                margin:0;
+                height:10%;
+            }
+            #header {
+              background-color: #353535;
+              color:#353535;
+              
+              text-align: center;
+              font-size: 70px;
+              height:20%;
+              font-weight: bold;
+              top: 0;
+              left:0;
+              width: 100%;
+              
+              font-family: 'Raleway', sans-serif;
+            }
+            .fade-in {
+                padding:0;
+                margin:0;
+            }
+            #headerinner {
+                position: relative;
+                margin:0;
+                padding:1px;
+                padding-bottom:5px;
+            }
+            .bottomline {
+                width: 100%;
+                height: 5px;
+                background-color:#454545;
+                position:absolute;
+                bottom:0;
+                left:0;
+            }
+            .fork {
+                position: absolute;
+                top:30%;
+                left:10px;
+                height:30%;
+                background-color: #1d8b42;
+                font-size:20px;
+                padding:.3em .6em;
+                border:1px solid gray;
+                border-radius: 5px;
+                cursor:pointer;
+                color:#1d8b42
+            }
+            .author {
+                position: absolute;
+                top:30%;
+                right:10px;
+                height:30%;
+                font-size:20px;
+                padding:.3em .6em;
+                color:#353535;
+            }
+            .body {
+                padding:3% 15%;
+            }
+            .menu {
+                display:flex;
+            }
+            .menu a {
+                color:white;
+                cursor: pointer;
+            }
+            .menu a:not(:last-child)::after {
+                content: " | ";
+                margin-right: 5px;
+                color:antiquewhite;
+                cursor: default;
+            }
+            .underline-title {
+                border-bottom: 2px solid gray;
+            }
+            .mini-underline {
+                text-decoration: underline;
+                text-decoration-color: rgb(92, 92, 92);
+            }
+            .scrollup {
+                width: 60px;
+                height: 60px;
+                opacity: 1;
+                position: fixed;
+                bottom: 50px;
+                right: 50px;
+                display: none;
+                z-index: 2;
+                opacity: .4;
+                /* background: url('./icon_up.png') no-repeat; */
+            }
+
+        </style>
+
+        <div id="header">
+            <div id="headerinner">
+                <div class="fork">View me on Github!</div>
+                <div class="author">Created by Malmadork</div>
+                <p class="fade-in">collidify.js</p>
+                <div class="bottomline"></div>
+            </div>
+        </div>
+        <div class="body">
+            <div class="menu">
+                <a href="#whatis"><u>What is collidify?</u></a>
+                <a href="#getstarted"><u>Get Started</u></a>
+                <a href="#docs"><u>Documentation</u></a>
+                <a href="#examples"><u>Examples</u></a>
+                <a href="#other"><u>Other Properties</u></a>
+                <a href="#changelog"><u>Changelog</u></a>
+            </div>
+
+            <h1 class="underline-title" id="whatis">What is collidify?</h1>
+            <p>collidify.js is a jQuery plugin that handles jQuery UI draggable collision events. 
+            <br><br>
+            During the process of working one of my projects, I really wanted to have draggable elements around a countainer, but revert back if invalid. 
+            Some libraries worked decently, but still overflowed outside of containers, or weren't very intuitive. 
+            I sought to solve this issue and make collision and revert events easier in jQuery. 
+            I then realized it might be nice to have borders appear when dragging over another element to signify where draggables can be dropped.
+            Thus, collidify.js has a built in border function to make certain collision events easier to handle!
+            <br><br>
+            In short, collidify.js can help handle your collision events with draggables and has built in methods for reverting and applying borders to elements!</p>
+            <h1 class="underline-title" id="getstarted">Get Started</h1>
+            <h2 class="mini-underline">Getting collidify.js</h2>
+            <h4 class="mini-underline">Source</h4>
+            You can download the source from GitHub <a href="https://github.com/Malmadork/collidify/blob/main/src/collidify.js" target="_blank" style="color:white">here.</a>
+            <h4 class="mini-underline">CDN - jsdelivr</h4>
+            You can use the CDN version of collidify <a href="https://cdn.jsdelivr.net/gh/Malmadork/collidify@main/src/collidify.js" target="_blank" style="color:white">here.</a>
+            <br><br>
+            <h2 class="mini-underline">Setup</h2>
+            collidify.js requires jQuery and jQuery UI to function! You can link the CDNs of the modules like this...
+            <pre class="language-markup"><code><!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>--></code></pre>
+            or get the official downloads for them here: <br>
+            <a href="https://jquery.com/" target="_blank"  style="color:white">jQuery</a><br>
+            <a href="https://jqueryui.com/" target="_blank"  style="color:white">jQuery UI</a><br><br>Make sure you link collidify.js <b>after</b> linking jQuery and UI!
+            
+            
+            <h1 class="underline-title" id="docs">Documentation</h1>
+            <p>collidify.js is super easy to use, and has a great amount potential for customization.</p>
+            <h2 class="mini-underline">Element.collidify()</h2>
+            <p>The syntax for using collidify is shown below. The collisionOptions is an object that is used for collisions,
+                whereas draggableOptions is where you can put your typical jQuery UI draggable options</p>
+            <pre class="language-javascript"><code>$(element).collidify(collisionOptions, draggableOptions)</code></pre>
+            
+            <h2 class="mini-underline">Options and Events</h2>
+            <h4 class="mini-underline">Options</h4>
+            <p>The collisionOptions parameter can take several options pertaining to collision events, and can be mix and matched. However, 
+                if borderStyle is used, borderClass does not need to be used.</p>
+            <pre class="language-javascript"><code>collides: [] || $(), // An array of elements, or an element that trigger collision events
+revert:   [] || $(), // An array of elements, or an element that will revert position if dragged over
+border:   [] || $(), // Lists the items, or an item that will receive a border when the element is dragged over
+borderStyle: "2px dashed blue", //The style for border events
+borderClass: ".border", //A class for border events</code></pre>
+
+            <h4 class="mini-underline">Events</h4>
+            <p>The collisionOptions parameter does also have a bunch of events that can be used with other options, and can be customized to your liking.</p>
+            <pre class="language-javascript"><code>onCollide() {}, // A function trat triggers whenever an element is dragged and collides
+onRevert()  {}, // A function trat triggers whenever an element is reverted
+onBorder()  {}, // A function trat triggers whenever an element is given a border
+onBorderRemove() {}, // A function trat triggers whenever an element's border is removed
+onCollideEnter() {}, // A function trat triggers whenever an element enters collision
+onCollideLeave() {}, // A function trat triggers whenever an element leaves collision
+
+// You may use the jquery start, drag, and end events in draggableOptions, 
+// but if you want to keep code concise, you can use the following events as well!
+onStart() {}, // Triggers when dragging starts (used in collisionOptions)
+onDrag() {}, // Triggers when dragging (used in collisionOptions)
+onEnd() {}, // Triggers when dragging ends (used in collisionOptions)</code></pre>
+
+            <h4 class="mini-underline">Array+Object Options</h4>
+            <p>Within the collides, border, or revert arrays, you can use objects to define certain fields. element is required when using objects, type defaults to enter, and borderStyle defaults to "1px solid red".</p>   
+            <pre class="language-javascript"><code>//Examples of using objects within arrays.
+collides: [
+    {
+        element: $('.draggable-collides'),
+        type: "enter" | "inside" //Enter detects collision when the item enters, inside when fully inside.
+    }
+]
+border: [
+    {
+        element: $('.draggable-border'),
+        type: "enter" | "inside" //Enter detects collision when the item enters, inside when fully inside.
+        borderStyle: "2px dashed purple" //Any CSS string to apply to the border
+    }
+]
+border: [
+    {
+        element: $('.draggable-border'),
+        type: "enter" | "inside" //Enter detects collision when the item enters, inside when fully inside.
+    }
+]
+</code></pre>
+
+            <h1 class="underline-title" id="examples">Examples</h1>
+            <h3 class="mini-underline">Creating Draggables</h3>
+            <p>This example shows you how to create a plain draggable (we'll get to the collision next!)</p>
+            <div id="features-create" class="container">
+                <div class="create-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>$('.draggable').collidify({}, {
+    containment: ".container"
+})</code></pre>
+
+            <h3 class="mini-underline">Collision Detection Over Another Element</h3>
+            <p>Detecting when collision is detected on entering an element.</p>
+            <div id="features-detect" class="container">
+                <div class="detect-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+                <div class="detect-obstacle obstacle">
+                    <p style="text-align: center;color:black">Drag over me!</p>
+                    <p style="text-align: center;color:black" class="detect-text">No Collision yet...</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>var options = {
+    collides: $('.obstacle'), //Elements to collide with
+    onCollideEnter: function() { //When Collision Detected:
+        $('.obstacle-text').html("Collision!")
+    },
+    onCollideLeave: function() { //When No More Collision:
+        $('.obstacle-text').html("No more Collision!")
+    }
+}
+
+$('.draggable').collidify(options, {
+    containment: ".container"
+})</code></pre>
+<h3 class="mini-underline">Detect Collision on Drag</h3>
+            <p>Detecting when collision is detected when dragging over an element.</p>
+            <div id="features-drag" class="container">
+                <div class="drag-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+                <div class="drag-obstacle obstacle">
+                    <p style="text-align: center;color:black">Drag over me!</p>
+                    <p style="text-align: center;color:black">Collisions:</p>
+                    <p style="text-align: center;color:black" class="drag-text">0</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>var options = {
+    collides: $('.obstacle'), //Elements to collide with
+    onCollide: function() {
+        let count = parseInt($('.count-text').html());
+        $('.count-text').html(count + 1)
+    }
+}
+
+$('.draggable').collidify(options, {
+    containment: ".container"
+})</code></pre>
+<h3 class="mini-underline">Detect Collision when Inside Element</h3>
+            <p>Detecting when collision is detected when entering an element completely.</p>
+            <div id="features-inside" class="container">
+                <div class="inside-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+                <div class="inside-obstacle obstacle">
+                    <p style="text-align: center;color:black">Drag inside me!</p>
+                    <p style="text-align: center;color:black" class="inside-text">No Collision yet...</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>var options = {
+    collides: [ {
+        element: $('.obstacle'), //Elements to collide with
+        type: "inside" //Default is "enter", but "inside" collision works different
+    } ],
+    onCollideEnter: function() { //When Collision Detected:
+        $('.obstacle-text').html("Collision!")
+    },
+    onCollideLeave: function() { //When No More Collision:
+        $('.obstacle-text').html("No more Collision!")
+    }
+}
+
+$('.draggable').collidify(options, {
+    containment: ".container"
+})</code></pre>
+
+<h3 class="mini-underline">Border on Collision</h3>
+            <p>Give a border to an element when dragged over.</p>
+            <div id="features-border" class="container">
+                <div class="border-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+                <div class="border-obstacle obstacle">
+                    <p style="text-align: center;color:black">Drag inside me!</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>var options = {
+    border: $('.obstacle'),
+    borderStyle: "2px dashed blue"
+}
+
+$('.draggable').collidify(options, {
+    containment: ".container"
+})</code></pre>
+
+<h3 class="mini-underline">Revert on Drop</h3>
+            <p>Reverts the draggable when it is dropped on another element.</p>
+            <div id="features-revert" class="container">
+                <div class="revert-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+                <div class="revert-obstacle obstacle">
+                    <p style="text-align: center;color:black" class="revert-text">Drag inside me and release!</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>var options = {
+    revert: $('.obstacle')
+}
+
+$('.draggable').collidify(options, {
+    containment: ".container"
+})</code></pre>
+
+<h3 class="mini-underline">Multiple Seperate Collisions</h3>
+            <p>Properties can be mixed and matched, and even customized to your liking!</p>
+            <div id="features-multiple" class="container">
+                <div class="multiple-draggable draggable" style="top:10px;left:10px">
+                    <p style="text-align: center;color:black">Drag Me!</p>
+                </div>
+                <div class="multiple-obstacle obstacle">
+                    <p style="text-align: center;color:black" class="multiple-text">Drag inside me for border 1!</p>
+                </div>
+                <div class="multiple-obstacle2 obstacle2">
+                    <p style="text-align: center;color:black" class="multiple-text">Drag inside me for border 2!</p>
+                </div>
+            </div>
+            <pre class="language-javascript"><code>var options = {
+    border: [
+        $('.obstacle'), 
+        {
+            element:$('.obstacle2'),
+            borderStyle: "3px solid green"
+        }
+    ],
+    revert: [
+        $('.obstacle'), 
+        $('.obstacle2')
+    ],
+    borderStyle: "2px dashed blue"
+}
+
+$('.draggable').collidify(options, {
+    containment: ".container"
+})</code></pre>
+
+<h1 class="underline-title" id="other">Experimental Draggables</h1>
+
+<div id="features-experiments" class="container">
+    <div class="experiments-draggable draggable" style="top:10px;left:10px">
+        <p style="text-align: center;color:black">Drag Me!</p>
+    </div>
+    <div class="experiments-obstacle obstacle">
+        <p style="text-align: center;color:black" class="experiments-text">Drag inside me for border 1!</p>
+    </div>
+    <div class="experiments-obstacle2 obstacle2">
+        <p style="text-align: center;color:black" class="experiments-text">Drag inside me for border 2!</p>
+    </div>
+</div>
+
+
+<h1 class="underline-title" id="other">Other Properties</h1>
+<h5>Collidify has some other variables that may not be as of much use to many, but I would still like to point them out here:</h5>
+<p><u>Variables for getting collision items:</u></p>
+<ul>
+    <li>$.fn.collidify.CollisionItems - Returns an array of all the items checking for collision</li>
+    <li>$.fn.collidify.BorderItems - Returns an array of all the items checking for border</li>
+    <li>$.fn.collidify.RevertItems - Returns an array of all the items checking for border</li>
+</ul>
+<p><u>Variables related to events/options:</u></p>
+<ul>
+    <li>$.fn.collidify.CollisionOptions - Returns an object of all the default event functions.</li>
+    <li>$.fn.collidify.draggableOptions - Returns an object of all the default draggable functions</li>
+</ul>
+<p><u>Checking Collision:</u></p>
+<ul>
+    <li>$.fn.collidify.hasCollision - The function that checks collision of an item.</li>
+</ul>
+
+<h1 class="underline-title" id="changelog">Changelog</h1>
+<h4>Major Changes:</h4>
+<ul>
+    <li>Using arrays with collidify selectors was fixed, and improved to be more customizable.</li>
+    <li>Fixed methods for simplicity, and made fields more straightforward.</li>
+</ul>
+<h4>Upcoming Updates:</h4>
+<ul>
+    <li>More optimization</li>
+    <li>More customization</li>
+</ul>
+
+
+<a href="#header" class="scrollup"><img src="icon_up.png" width=60px height=60px></a>
+            
+        </div>
+        
+        <script>
+
+     $(window).scroll(function () {
+         if ($(this).scrollTop() > 100) {
+             //console.log("ol")
+             $('.scrollup').fadeIn();
+         } else {
+             $('.scrollup').fadeOut();
+         }
+     });
+     
+
+            window.onload = function() {
+                
+                $('.fade-in').animate({color: "white"}, 400)
+                $('.author').animate({color: "#F0E7d5"}, 900)
+                $('.fork').animate({color: "#353535"}, 900)
+            }
+
+            $('.fork').off().hover(function() {
+                $(this).animate({borderColor:"white"}, {duration:200})
+            }, function() {
+                $(this).animate({borderColor:"gray"}, {duration:200})
+            })
+            $('.fork').mousedown(function(){
+                let a = document.createElement('a');
+                a.href = "https://github.com/Malmadork/collidify";
+                a.target = "_blank";
+                a.click();
+            })
+
+            $('.create-draggable').collidify({}, {
+                scroll: false,
+                containment: "#features-create"
+            })
+            $('.detect-draggable').collidify({
+                collides: [ $('.detect-obstacle')],
+                onCollideEnter: function() {
+                    $('.detect-text').html("Collision!")
+                },
+                onCollideLeave: function() {
+                    $('.detect-text').html("No more Collision!")
+                }
+            }, {
+                scroll: false,
+                containment: "#features-detect"
+            })
+
+            $('.drag-draggable').collidify({
+                collides: [ $('.drag-obstacle')],
+                onCollide: function() {
+                    let count = parseInt($('.drag-text').html());
+                    $('.drag-text').html(count + 1)
+                }
+            }, {
+                scroll: false,
+                containment: "#features-drag"
+            })
+
+            $('.inside-obstacle').height("100%");
+            $('.inside-draggable').collidify({
+                collides: [ {
+                    element: $('.inside-obstacle'), //Elements to collide with
+                    type: "inside" //Default is "enter", but "inside" collision works different
+                } ],
+                onCollideEnter: function() { //When Collision Detected:
+                    $('.inside-text').html("Collision!")
+                },
+                onCollideLeave: function() { //When No More Collision:
+                    $('.inside-text').html("No more Collision!")
+                }
+            }, {
+                scroll: false,
+                containment: "#features-inside"
+            })
+
+            $('.border-draggable').collidify({
+                border: [ $('.border-obstacle') ],
+                borderStyle: "2px dashed blue"
+            }, {
+                scroll: false,
+                containment: "#features-border"
+            })
+            $('.revert-draggable').collidify({
+                revert: [ $('.revert-obstacle') ],
+                collides: [
+                    $('.revert-obstacle')
+                ],
+                onCollideEnter: function() { //When Collision Detected:
+                    $('.revert-text').html("Release!")
+                },
+                onRevert: function() { //When No More Collision:
+                    $('.revert-text').html("Drag inside me and Release!")
+                },
+                onCollideLeave: function() {
+                    $('.revert-text').html("Drag inside me and Release!")
+                }
+                
+            }, {
+                scroll: false,
+                containment: "#features-revert"
+            })
+
+
+$('.multiple-draggable').collidify({
+    border: [
+        $('.multiple-obstacle'), 
+        {
+            element:$('.multiple-obstacle2'),
+            type: "enter",
+            borderStyle: "3px solid green"
+        }
+    ],
+    revert: [
+        $('.multiple-obstacle'), 
+        $('.multiple-obstacle2')
+    ],
+    borderStyle: "2px dashed blue"
+}, {
+    containment: "#features-multiple"
+})
+
+
+$('.experiments-draggable').collidify({
+    // border: [
+    //     $('.experiments-obstacle'), 
+    //     {
+    //         element:$('.experiments-obstacle2'),
+    //         type: "enter",
+    //         borderStyle: "3px solid green"
+    //     }
+    // ],
+    style: 
+        {
+            element: $('.experiments-obstacle2'),
+            css: ["border"],
+            type: "enter",
+            style: ["3px solid green"]
+        }
+    ,
+    revert: [
+        $('.experiments-obstacle'), 
+        $('.experiments-obstacle2')
+    ],
+    borderStyle: "2px dashed blue"
+}, {
+    containment: "#features-experiments"
+})
+
+        </script>
+    </body>
+</html>
