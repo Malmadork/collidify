@@ -608,13 +608,19 @@ $('.experiments-draggable').collidify({
     //         borderStyle: "3px solid green"
     //     }
     // ],
-    style: 
+    style: [
         {
             element: $('.experiments-obstacle2'),
+            css: "border",
+            type: "enter",
+            style: "3px solid green"
+        }, 
+        {   element: $('.experiments-obstacle'),
             css: ["border"],
             type: "enter",
-            style: ["3px solid green"]
+            style: ["3px solid red"]
         }
+     ]
     ,
     revert: [
         $('.experiments-obstacle'), 

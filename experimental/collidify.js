@@ -41,6 +41,7 @@
 
                 if($.fn.collidify.CollisionItems.length > 0) {
                     $.fn.collidify.CollisionItems.forEach(item => {
+                        
 
                         item.position.newPosition.top = $(this).offset().top;
                         item.position.newPosition.left = $(this).offset().left;
@@ -77,6 +78,8 @@
                                 item.isColliding = true;
                                 if(CollisionOptions.onStyle()) CollisionOptions.onStyle();
 
+                                //(item);
+
                                 // FIX THIS PLEASE
                                 // THIS DONT WORK
                                 // AHHHHHHHHHHHHH
@@ -87,7 +90,7 @@
                                     item.postStyle.forEach( (s) => {
                                         //console.log(s);
                                         let obj = {};
-                                        obj[s.postStyle.css] = istem.postStyle.style;
+                                        obj[s.postStyle.css] = item.postStyle.style;
                                         s.element.css(obj)
                                     })
                                 }
@@ -113,13 +116,14 @@
 
                             if(Array.isArray(item.preStyle)) {
                                 item.preStyle.forEach( (s) => {
-                                    //console.log(s);
+                                    console.log(s);
                                     let obj = {};
                                     obj[s.preStyle.css] = s.preStyle.style;
                                     s.element.css(obj)
                                 })
                             }
                             else {
+                                console.log(item)
                                 let obj = {};
                                 obj[item.preStyle.css] = item.preStyle.style;
                                 item.element.css(obj)
@@ -145,6 +149,7 @@
                         if($.fn.collidify.hasCollision(item.element, item.type, item.position)) {
                             $(this).offset({top:item.position.originalPosition.top, left:item.position.originalPosition.left})
                                 if(CollisionOptions.onRevert) CollisionOptions.onRevert();
+                                console.log(item)
                                 if(item.preStyle && item.preStyle != null && item.preStyle.css != null && Array.isArray(item.preStyle.css)) {
                                     item.preStyle.forEach( (s) => {
 
@@ -153,7 +158,8 @@
                                         // AHHHHHHHHHHHHH
 
                                          // It probably needs two for loops or something. not changing styles.
-                                        
+                                          
+                                        console.log("unload")
                                         let obj = {};
                                         obj[s.preStyle.css] = s.preStyle.style;
                                         s.element.css(obj)
@@ -161,9 +167,11 @@
                                 }
                                 else if(item.preStyle && item.preStyle != null && item.preStyle.css != null && !Array.isArray(item.preStyle.css)) {
                                     //if(item.preStyle.css && item.preStyle.css != null) {
+                                        console.log("unload")
                                         let obj = {};
                                         obj[item.preStyle.css] = item.preStyle.style;
                                         item.element.css(obj)
+                                        
                                     //}
                                 }
                         }
@@ -262,7 +270,7 @@
                             let obj = (item.element && typeof item.element === 'object' && item.element.selector &&
                                        item.css && item.style && !Array.isArray(item.style) && !Array.isArray(item.css)) ? 
         {
-            type: (item.type != undefined) ? item.type : (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+            type: (item.style.type != undefined) ? item.style.type : (CollisionOptions.style.type !== undefined) ? CollisionOptions.style.type : "enter",
             element: item.element,
             position: {
                 originalPosition: {
@@ -280,7 +288,7 @@
             },
             preStyle: {
                 type: (item.type ? item.type : "enter"),
-                css: item.style,
+                css: item.css,
                 style: item.element.css(item.css)
             },
             postStyle: {
@@ -292,7 +300,7 @@
         } : ((item.element && typeof item.element === 'object' && item.element.selector && 
               item.css && item.style && Array.isArray(item.style) && Array.isArray(item.css) && item.css.length == item.style.length) ?
         {
-            type: (item.type != undefined) ? item.type : (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
+            type: (item.style.type != undefined) ? item.style.type : (CollisionOptions.type !== undefined) ? CollisionOptions.type : "enter",
             element: item.element,
             position: {
                 originalPosition: {
@@ -324,10 +332,15 @@
                             if(obj !== null) {
                                 if(Array.isArray(obj.preStyle.css)) {
                                     item.css.forEach( (key) => {
+                                        
                                         obj.preStyle.style.push(obj.element.css(key));
+                                        
                                     })
                                 }
-                                
+                                else {
+                                    console.log(obj)
+                                }
+                                //console.log(obj)
                                 $.fn.collidify.StyleItems.push(obj)
                             }
                         })
@@ -341,7 +354,7 @@
                         Array.isArray(CollisionOptions.style.style) && Array.isArray(CollisionOptions.style.css) && 
                         CollisionOptions.style.css.length == CollisionOptions.style.style.length) {
                             obj = {
-                                type: (CollisionOptions.style.type !== undefined) ? CollisionOptions.type : "enter",
+                                type: (CollisionOptions.style.type !== undefined) ? CollisionOptions.style.type : "enter",
                                 element: CollisionOptions.style.element,
                                 position: {
                                     originalPosition: {
@@ -373,7 +386,7 @@
                         else if(CollisionOptions.style.css && CollisionOptions.style.style && 
                             !Array.isArray(CollisionOptions.style.style) && !Array.isArray(CollisionOptions.style.css)) {
                             obj = {
-                                type: (CollisionOptions.style.type !== undefined) ? CollisionOptions.type : "enter",
+                                type: (CollisionOptions.style.type !== undefined) ? CollisionOptions.style.type : "enter",
                                 element: CollisionOptions.style.element,
                                 position: {
                                     originalPosition: {
@@ -402,7 +415,7 @@
                                 isColliding: false
                             }
                         }
-                    
+                    //console.log(obj)
                     if(obj !== null) $.fn.collidify.StyleItems.push(obj)
                 }
             }
